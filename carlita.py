@@ -24,7 +24,7 @@ import random
 ################################################################################
 # Parameters for Twitter API, register your app and save your parameters here: #
 ################################################################################
-api = twitter.Api(consumer_key='consumer_key_from', consumer_secret='consumer_secret', access_token_key='access_token_key', access_token_secret='access_token_secret') 
+#api = twitter.Api(consumer_key='consumer_key_from', consumer_secret='consumer_secret', access_token_key='access_token_key', access_token_secret='access_token_secret') 
 #################################################################################
 # Set here the directory where your bot will be running:                        #
 #################################################################################
@@ -36,6 +36,7 @@ usr = 'carlita'
 #################################################################################
 # Set the delay between API interactions                                        #
 # https://dev.twitter.com/docs/rate-limiting                                    #
+# 15 segs should be fine to run this script in some kind of loop                #
 #################################################################################
 dly = 15
 ## no need to set more vars after here
@@ -51,7 +52,7 @@ def messages(dm,L,R):
     for message in dm:
         sender = message.GetSenderScreenName()
         print 'received: ' + message.GetText() + 'from: ' + message.GetSenderScreenName()
-        response = megahal.get_reply(message.GetText())
+        response = get_reply(message.GetText())
         megahal.learn(message.GetText())
         print  'sent: ' + response 
         if response in R:
@@ -59,6 +60,7 @@ def messages(dm,L,R):
         else:
             try:
                 api.PostDirectMessage(sender, response) 
+                time.sleep(dly)
                 R.append(response)
             except twitter.TwitterError:
                 pass
@@ -74,11 +76,12 @@ def followers(fr,friends):
                 haveit = 1
         if haveit == 0:
             try:
-                api.CreateFriendship(flw.GetScreenName())   
+                api.CreateFriendship(flw.GetScreenName())  
+                time.sleep(dly) 
             except twitter.TwitterError:
                 pass
             print "follwing:" + flw.GetScreenName()
-        time.sleep(dly)
+        
 
 #learn stuff from my timeline 
 def learnut(ut):
@@ -91,14 +94,27 @@ def saytt(ut,L,R):
     if ut[i].GetId() in L:
         print "tweet already worked"
     else:
-        response = "@" + ut[i].GetUser().GetScreenName() + " "  + megahal.get_reply(ut[i].GetText())
+        response = "@" + ut[i].GetUser().GetScreenName() + " "  + get_reply(ut[i].GetText())
         if response in R:
             print "that was already said sometime"
         else:
             api.PostUpdates(response)
+            time.sleep(dly)
             R.append(response)
         L.append(ut[i].GetId())
-    time.sleep(dly)
+
+
+# Get the replys from Megahal
+def get_reply(text):
+    response = megahal.get_reply(text)
+    # remove the "t.co" from the response
+    rp = response.split()
+    response = ""
+    for word in rp:
+        if not 't.co' in word and \
+           not "bot" in word:
+           response = response + word + " "
+    return response
 
 # Get mentions from the API and reply them
 def mentions(mt,L,R):
@@ -108,10 +124,11 @@ def mentions(mt,L,R):
         else:
             tweet = mention.GetText()
             tweet = tweet.replace(u"@" + usr," ")
+            tweet = tweet.replace(u"bot"," ")
             response = "oops"
             try:
                 print "got tweet: " + tweet
-                response = "@" + mention.GetUser().GetScreenName() + " " +  megahal.get_reply(tweet)
+                response = "@" + mention.GetUser().GetScreenName() + " " +  get_reply(tweet)
                 megahal.learn(tweet)
             except UnicodeEncodeError:
                 pass
@@ -120,11 +137,12 @@ def mentions(mt,L,R):
             else:
                 try:
                     api.PostUpdates(response)
+                    time.sleep(dly)
                 except twitter.TwitterError:
                     pass
                 R.append(response)
             L.append(mention.GetId())
-            time.sleep(dly)
+
 
 # Find new users to friend in my TL
 def newfriends(ut,friends):
@@ -142,9 +160,10 @@ def newfriends(ut,friends):
                     print "following: " + word[0]
                     try:
                         api.CreateFriendship(word[0])
+                        time.sleep(dly)
                     except twitter.TwitterError:
                         pass
-                    time.sleep(dly)
+
         
 # Save responses and ids            
 def save(L,R):
@@ -179,31 +198,34 @@ def main():
 
     print "getting DMs"
     dm = api.GetDirectMessages()
-    messages(dm,L,R)
     time.sleep(dly)
+    messages(dm,L,R)
+
 
     print "checking for new followers"
     fr = api.GetFollowers()
-    friends = api.GetFriends()
-    followers(fr,friends)
     time.sleep(dly)
+    friends = api.GetFriends()
+    time.sleep(dly)
+    followers(fr,friends)
 
     print "getting new mentions"
     mt = api.GetMentions()
+    time.sleep(dly)
     mentions(mt,L,R)
     save(L,R)
-    time.sleep(dly)
+
 
     print "getting my TL to learn new stuff and reply"
     ut = api.GetFriendsTimeline()
-    learnut(ut)
     time.sleep(dly)
+    learnut(ut)
 
+    # Say something random only if this var gets some value under 20
     sayornot = random.randint(1, 100)
     if (sayornot < 20):
         print "sayng something random"
         saytt(ut,L,R)
-        time.sleep(dly)
 
     print "getting new friends from TL"
     newfriends(ut,friends)
