@@ -7,3 +7,9 @@ Requires:
 
 python-twitter
 halpy
+
+More info can be found in my blog: 
+http://mkreder.com/carlita 
+
+And you can see this working on:
+https://twitter.com/carlitabot
