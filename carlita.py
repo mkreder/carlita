@@ -26,7 +26,7 @@ import random
 ################################################################################
 api = twitter.Api(consumer_key='consumer_key_from', consumer_secret='consumer_secret', access_token_key='access_token_key', access_token_secret='access_token_secret') 
 #################################################################################
-# Set here the directory where your bot will be running:                      #
+# Set here the directory where your bot will be running:                        #
 #################################################################################
 pwd = '/home/carlita'
 #################################################################################
