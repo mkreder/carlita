@@ -24,7 +24,7 @@ import random
 ################################################################################
 # Parameters for Twitter API, register your app and save your parameters here: #
 ################################################################################
-#api = twitter.Api(consumer_key='consumer_key_from', consumer_secret='consumer_secret', access_token_key='access_token_key', access_token_secret='access_token_secret') 
+api = twitter.Api(consumer_key='consumer_key_from', consumer_secret='consumer_secret', access_token_key='access_token_key', access_token_secret='access_token_secret') 
 #################################################################################
 # Set here the directory where your bot will be running:                      #
 #################################################################################
