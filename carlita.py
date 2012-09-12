@@ -35,7 +35,7 @@ usr = 'carlita'
 #################################################################################
 # Set the delay between API interactions                                        #
 # https://dev.twitter.com/docs/rate-limiting                                    #
-# 15 segs should be fine to run this script in some kind of loop                #
+# 15 secs should be fine to run this script in some kind of loop                #
 #################################################################################
 dly = 15
 ## no need to set more vars after here
