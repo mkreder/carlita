@@ -15,7 +15,6 @@
 # Author: Matias Kreder <mkreder@gmail.com> 
 
 from megahal import *
-from pprint import pprint 
 import twitter 
 import time
 import pickle
@@ -42,7 +41,6 @@ dly = 15
 ## no need to set more vars after here
 megahal = MegaHAL()
 megahal.train( pwd + "/brain.trn")
-true = 0
 L = list()     
 R = list()
 
@@ -168,12 +166,10 @@ def newfriends(ut,friends):
 # Save responses and ids            
 def save(L,R):
     print "Saving L"
-    pprint(L)
     f = open(pwd + '/ids','wb')
     pickle.dump(L,f)
     f.close
     print "Saving R"
-    pprint(R)
     f2 = open(pwd + '/responses','wb')
     pickle.dump(R,f2)
     f2.close
